@@ -27,4 +27,20 @@ library components intended to be composed by an embedding application.
 
 ## Main packages
 
-`marine`, `cranes`, `yard`, `gate`, `customs`, `reefer`, `hazmat`, `equipment`, `rail`, `billing`, `transshipment`, `planning`, `persistence`, `reporting`, and `api`.
+`marine`, `cranes`, `yard`, `gate`, `customs`, `reefer`, `hazmat`, `equipment`, `rail`, `billing`, `transshipment`, `planning`, `persistence`, `reporting`, `api`, and `disruptions`.
+
+## Disruption recovery
+
+The `disruptions` package handles temporary channel or berth closures:
+
+- `ImpactAnalyzer` identifies the affected vessel calls (direct), quay-crane
+  work, transshipment connections and landside handovers (cascading);
+- `RecoveryPlanner` produces a phased plan — containment, resumption,
+  catch-up, normalization — with deterministic per-action resource occupancy;
+- resource clashes against the baseline plan, other recovery actions, or the
+  closure window are returned as explicit `RecoveryConflict`s instead of being
+  silently rescheduled;
+- `DisruptionRegistry` processes each disruption idempotently: re-running an
+  analysis revises the existing plan (revision counter increments), never
+  creates a second set of reservations, and carries started/completed actions
+  forward verbatim via a monotonic `proposed → started → completed` lifecycle.
