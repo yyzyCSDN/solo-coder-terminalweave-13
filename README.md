@@ -27,4 +27,17 @@ library components intended to be composed by an embedding application.
 
 ## Main packages
 
-`marine`, `cranes`, `yard`, `gate`, `customs`, `reefer`, `hazmat`, `equipment`, `rail`, `billing`, `transshipment`, `planning`, `persistence`, `reporting`, and `api`.
+`marine`, `cranes`, `yard`, `gate`, `customs`, `reefer`, `hazmat`, `equipment`, `rail`, `billing`, `transshipment`, `disruptions`, `planning`, `persistence`, `reporting`, and `api`.
+
+## Disruption recovery
+
+`terminalweave.disruptions` handles temporary channel or berth closures:
+
+- `DisruptionManager.assess` finds every affected vessel schedule, quay-crane
+  assignment, transshipment connection, and gate/rail handoff;
+- started and completed items are locked and never moved backwards;
+- `recover` produces a phased plan (`resume` → `catch_up` → `normalize`),
+  queues catch-up work behind in-flight resource users, and reports any
+  remaining resource overloads as explicit conflicts;
+- replanning the same closure returns the cached plan, so repeated processing
+  never creates a second set of resource occupations.
